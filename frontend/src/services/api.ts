@@ -3,8 +3,20 @@ import Constants from 'expo-constants';
 import { AppStorage } from './storage';
 import { AttendanceReportRecord, AttendanceReportInput } from '@ad-garments/domain';
 
+const LIVE_RENDER_API_URL = 'https://ram-attendace.onrender.com';
+
 export function getDefaultApiUrl(): string {
-  // 1. Try to extract Metro bundler host IP from Expo Constants (works on physical phone & Expo Go)
+  // 1. Explicit environment variable (from eas.json, .env, or build config)
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL.replace(/\/+$/, '');
+  }
+
+  // 2. Production or standalone APK builds always default to Render cloud backend
+  if (!__DEV__) {
+    return LIVE_RENDER_API_URL;
+  }
+
+  // 3. In local development: check Metro bundler host IP
   const hostUri =
     Constants.expoConfig?.hostUri ||
     (Constants as any).manifest2?.extra?.expoClient?.hostUri ||
@@ -17,13 +29,13 @@ export function getDefaultApiUrl(): string {
     }
   }
 
-  // 2. Android Emulator default loopback alias
+  // 4. Android Emulator loopback
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:4000';
   }
 
-  // 3. Web & iOS Simulator
-  return 'http://localhost:4000';
+  // 5. Default fallback to live Render backend
+  return LIVE_RENDER_API_URL;
 }
 
 export interface UserSession {
