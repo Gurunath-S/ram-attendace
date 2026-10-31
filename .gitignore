@@ -1,0 +1,11 @@
+node_modules/
+dist/
+build/
+.expo/
+*.log
+.env
+.env.local
+coverage/
+.DS_Store
+*.db
+*.db-journal
