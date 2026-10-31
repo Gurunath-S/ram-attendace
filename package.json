@@ -15,7 +15,7 @@
     "frontend:dev": "npm run web --workspace=@ad-garments/mobile",
     "frontend:start": "npm run start --workspace=@ad-garments/mobile",
     "test": "npm run test --workspaces --if-present",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace=@ad-garments/domain && npm run build --workspace=@ad-garments/api",
     "eas-build-post-install": "npm run build --workspace=@ad-garments/domain",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"

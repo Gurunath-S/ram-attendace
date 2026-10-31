@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prebuild": "npm --prefix ../packages/domain run build",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "migrate": "tsx src/db/migrate.ts",
