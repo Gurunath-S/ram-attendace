@@ -5,6 +5,7 @@ export type ReportStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REOPENED';
 export type SyncStatus = 'PENDING' | 'SYNCED' | 'FAILED' | 'CONFLICT';
 
 export interface DepartmentConfig {
+  id?: string;
   code: string;
   label: string;
   unit: 'UNIT-1' | 'UNIT-2';

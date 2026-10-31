@@ -4,11 +4,19 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "backend",
+    "frontend"
   ],
   "scripts": {
+    "start": "npm run dev --workspace=@ad-garments/api",
+    "backend:dev": "npm run dev --workspace=@ad-garments/api",
+    "migrate": "npm run migrate --workspace=@ad-garments/api",
+    "db:init": "npm run db:init --workspace=@ad-garments/api",
+    "frontend:dev": "npm run web --workspace=@ad-garments/mobile",
+    "frontend:start": "npm run start --workspace=@ad-garments/mobile",
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
+    "eas-build-post-install": "npm run build --workspace=@ad-garments/domain",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

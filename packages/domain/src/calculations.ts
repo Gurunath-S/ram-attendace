@@ -1,6 +1,7 @@
 import {
   UNIT_1_DEPARTMENTS,
   UNIT_2_DEPARTMENTS,
+  DepartmentConfig,
   CalculatedReportTotals,
 } from './attendance-types.js';
 
@@ -9,6 +10,31 @@ export class InvalidCountError extends Error {
     super(message);
     this.name = 'InvalidCountError';
   }
+}
+
+/**
+ * Validates that a department name is unique within its unit.
+ */
+export function validateUniqueDepartment(
+  label: string,
+  existingDepts: DepartmentConfig[],
+  editingCode?: string
+): { isValid: boolean; error?: string } {
+  const trimmed = label.trim();
+  if (!trimmed) {
+    return { isValid: false, error: 'Department name cannot be empty' };
+  }
+  const normalized = trimmed.toLowerCase();
+  const duplicate = existingDepts.find(
+    (d) => d.label.trim().toLowerCase() === normalized && d.code !== editingCode
+  );
+  if (duplicate) {
+    return {
+      isValid: false,
+      error: `A field named "${trimmed}" already exists in this unit. Duplicate fields are not allowed in the same unit.`,
+    };
+  }
+  return { isValid: true };
 }
 
 /**
@@ -48,12 +74,14 @@ export function sanitizeCount(value: unknown, fieldName: string): number | null 
 export function calculateAttendanceTotals(
   entries: Record<string, number | null | undefined>,
   staffCount: number | null | undefined,
-  shiftCount: number | null | undefined
+  shiftCount: number | null | undefined,
+  u1Depts: DepartmentConfig[] = UNIT_1_DEPARTMENTS,
+  u2Depts: DepartmentConfig[] = UNIT_2_DEPARTMENTS
 ): CalculatedReportTotals {
   const missingFields: string[] = [];
 
   let unit1Total = 0;
-  for (const dept of UNIT_1_DEPARTMENTS) {
+  for (const dept of u1Depts) {
     const rawVal = entries[dept.code];
     const val = sanitizeCount(rawVal, dept.code);
     if (val === null) {
@@ -64,7 +92,7 @@ export function calculateAttendanceTotals(
   }
 
   let unit2Total = 0;
-  for (const dept of UNIT_2_DEPARTMENTS) {
+  for (const dept of u2Depts) {
     const rawVal = entries[dept.code];
     const val = sanitizeCount(rawVal, dept.code);
     if (val === null) {

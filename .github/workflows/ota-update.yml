@@ -1,0 +1,41 @@
+name: Automatic Over-The-Air (OTA) Update
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'frontend/**'
+      - 'packages/domain/**'
+      - '.github/workflows/ota-update.yml'
+
+jobs:
+  publish-ota:
+    name: 🚀 Publish OTA Update to Mobile Devices
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 📦 Install Dependencies
+        run: npm ci || npm install
+
+      - name: 🔨 Build Shared Domain Library
+        run: npm run build --workspace=@ad-garments/domain
+
+      - name: 🛠 Setup EAS CLI
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📡 Publish OTA Update to Production Channel
+        working-directory: frontend
+        run: |
+          npx eas-cli update --auto --branch production --message "Automated update from commit ${{ github.sha }}: ${{ github.event.head_commit.message }}"

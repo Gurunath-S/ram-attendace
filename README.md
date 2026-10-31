@@ -8,27 +8,21 @@ A production-grade, offline-first attendance reporting application engineered sp
 
 The project is structured as an enterprise TypeScript monorepo with NPM workspaces:
 
-```
+├── backend/                    # Node.js + Express + PostgreSQL REST Backend API
+│   ├── src/controllers/        # Attendance, Auth, Report & Sync endpoints
+│   ├── src/services/           # Concurrency revisions, PDF/Excel generation, Sync push/pull
+│   ├── src/repositories/       # Transactional PostgreSQL access & audit logs
+│   ├── src/db/                 # Connection pool, seed script & migrations
+│   └── tests/                  # End-to-end API integration tests
+├── frontend/                   # High-Performance Cross-Platform React Native + Web App
+│   ├── src/app/                # File-based screens (Dashboard, Daily Entry, Reports, History, Settings)
+│   ├── src/services/           # SQLite & Web local DB, Sync Engine, PDF & Share service
+│   ├── src/context/            # Offline session authentication & role management
+│   └── src/theme/              # Executive luxury industrial UI theme
 ├── packages/
 │   └── domain/                 # Core domain logic, validation schemas & calculation engine
-│       ├── src/attendance-types.ts
-│       ├── src/calculations.ts # Exact Unit-1, Unit-2, Staff, Shift & Grand Total formulas
-│       ├── src/date-rules.ts   # Week/month bounds & date normalization
-│       └── src/validation.ts   # Zod schemas for drafts, submission & sync
-├── apps/
-│   ├── api/                    # Node.js + Express + PostgreSQL REST Backend
-│   │   ├── src/controllers/   # Attendance, Auth, Report & Sync endpoints
-│   │   ├── src/services/      # Concurrency revisions, PDF/Excel generation, Sync push/pull
-│   │   ├── src/repositories/  # Transactional PostgreSQL access & audit logs
-│   │   └── tests/             # End-to-end API integration tests
-│   └── mobile/                 # Cross-platform React Native + Expo App
-│       ├── src/app/           # Expo Router file-based screens (Dashboard, Entry, Reports, History, Settings)
-│       ├── src/services/      # SQLite local database, Sync Engine, PDF & Share service
-│       ├── src/context/       # Offline session authentication & role management
-│       └── src/theme/         # Industrial garment manufacturing UI theme
 └── database/
-    └── migrations/            # Versioned SQL migrations (Factories, Units, Depts, Reports, Entries, Adjustments, Audits, Sync Ops)
-```
+    └── migrations/             # Versioned PostgreSQL migrations
 
 ---
 
@@ -86,10 +80,10 @@ cp .env.example .env
 # Ensure DATABASE_URL is set (e.g. postgresql://guru@localhost:5432/ad_garments_attendance)
 
 # Run migrations
-psql -d ad_garments_attendance -f database/migrations/001_initial_schema.sql
+npm run migrate
 
 # Seed initial factory data, departments, default users & reference historical reports
-npx tsx apps/api/src/db/seed.ts
+npm run seed
 ```
 
 ### 2. Default Seeded Credentials
@@ -99,16 +93,20 @@ npx tsx apps/api/src/db/seed.ts
 
 ### 3. Running Backend API
 ```bash
+npm run backend:dev
+# or
 npm run dev --workspace=@ad-garments/api
-# Server runs at http://localhost:3000
-# Health check: http://localhost:3000/health
+# Server runs at http://localhost:4000
+# Health check: http://localhost:4000/health
 ```
 
-### 4. Running Mobile Application
+### 4. Running Frontend Application
 ```bash
-# Start Expo development server (Web / Android / iOS)
-npm run start --workspace=@ad-garments/mobile
-# Press 'w' to run in browser, or scan QR code in Expo Go app on Android/iOS
+# Web browser:
+npm run frontend:dev
+
+# Or Native / Expo Metro (Android / iOS):
+npm run frontend:start
 ```
 
 ---
